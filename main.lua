@@ -1,11 +1,5 @@
 -- ZenithHub v1.1
--- Автор: ты
-
--- Проверка игры (PlaceId PS99)
-if game.PlaceId ~= 8737899170 then
-    game:Shutdown()
-    return
-end
+-- Автор:
 
 -- WhiteList по UserId
 local allowed = {
