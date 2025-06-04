@@ -1,9 +1,8 @@
--- ZenithHub v1.1
--- Автор:
+-- ZenithHub v1.0 
 
 -- WhiteList по UserId
 local allowed = {
-    [8428035106] = true -- добавляй других по необходимости
+    [8428035106] = true -- добавь других если надо
 }
 if not allowed[game.Players.LocalPlayer.UserId] then
     game:Shutdown()
@@ -14,44 +13,23 @@ end
 pcall(function()
     game.StarterGui:SetCore("SendNotification", {
         Title = "ZenithHub",
-        Text = "Добро пожаловать!",
+        Text = "Запуск кастомного GUI...",
         Duration = 4
     })
 end)
 
--- Подключение Rayfield UI
+-- Подключение Rayfield
 local Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
 
--- Настройки языка
-local Languages = {
-    ["RU"] = {
-        TabName = "Главная",
-        ButtonName = "Переводчик",
-        Notify = "Язык изменён на русский"
-    },
-    ["EN"] = {
-        TabName = "Home",
-        ButtonName = "Translator",
-        Notify = "Language switched to English"
-    },
-    ["UA"] = {
-        TabName = "Головна",
-        ButtonName = "Перекладач",
-        Notify = "Мову змінено на українську"
-    }
-}
-
--- Текущий язык
-local currentLang = "RU"
-local lang = Languages[currentLang]
-
--- Создание окна
+-- Настройки интерфейса
 local Window = Rayfield:CreateWindow({
-	Name = "ZenithHub",
+	Name = "ZenithHub | Pet Simulator 99",
 	LoadingTitle = "ZenithHub",
-	LoadingSubtitle = "by ты",
+	LoadingSubtitle = "Custom Zap-like UI by ты",
 	ConfigurationSaving = {
-		Enabled = false
+		Enabled = true,
+		FolderName = "ZenithHub",
+		FileName = "zapstyle_ui"
 	},
 	Discord = {
 		Enabled = false
@@ -59,27 +37,68 @@ local Window = Rayfield:CreateWindow({
 	KeySystem = false
 })
 
--- Главная вкладка
-local MainTab = Window:CreateTab(lang.TabName, 4483345998)
+-- Языки
+local Languages = {
+    ["RU"] = {
+        Tabs = {
+            Main = "Главная",
+            Farm = "Фарм",
+            Teleport = "Телепорт",
+            Player = "Игрок",
+            Misc = "Разное"
+        },
+        Notify = "Язык: Русский"
+    },
+    ["EN"] = {
+        Tabs = {
+            Main = "Home",
+            Farm = "Farm",
+            Teleport = "Teleport",
+            Player = "Player",
+            Misc = "Misc"
+        },
+        Notify = "Language: English"
+    },
+    ["UA"] = {
+        Tabs = {
+            Main = "Головна",
+            Farm = "Фарм",
+            Teleport = "Телепорт",
+            Player = "Гравець",
+            Misc = "Різне"
+        },
+        Notify = "Мова: Українська"
+    }
+}
 
--- Кнопка перевода
-MainTab:CreateButton({
-	Name = lang.ButtonName,
+-- Язык по умолчанию
+local currentLang = "RU"
+local lang = Languages[currentLang]
+
+-- Создание вкладок
+local tabs = {}
+for key, name in pairs(lang.Tabs) do
+    tabs[key] = Window:CreateTab(name, 4483345998)
+end
+
+-- Пример кнопки в Главной вкладке
+tabs.Main:CreateButton({
+	Name = "Сменить язык",
 	Callback = function()
 		Rayfield:Notify({
 			Title = "ZenithHub",
-			Content = "Выбери язык в чате: 1 - Рус, 2 - Англ, 3 - Укр",
-			Duration = 6
+			Content = "Напиши в чат: 1 - Рус, 2 - Англ, 3 - Укр",
+			Duration = 5
 		})
 
-		local connection
-		connection = game.Players.LocalPlayer.Chatted:Connect(function(msg)
+		local chatConnection
+		chatConnection = game.Players.LocalPlayer.Chatted:Connect(function(msg)
 			if msg == "1" then currentLang = "RU"
 			elseif msg == "2" then currentLang = "EN"
 			elseif msg == "3" then currentLang = "UA"
 			else return end
 
-			connection:Disconnect()
+			chatConnection:Disconnect()
 			Rayfield:Notify({
 				Title = "ZenithHub",
 				Content = Languages[currentLang].Notify,
@@ -89,4 +108,15 @@ MainTab:CreateButton({
 			loadstring(game:HttpGet("https://raw.githubusercontent.com/cheese123/zenithhub/main/main.lua"))()
 		end)
 	end
+})
+
+-- Можешь добавлять свои функции вот так:
+-- tabs.Farm:CreateToggle({...})
+-- tabs.Teleport:CreateDropdown({...})
+
+-- Добро пожаловать
+Rayfield:Notify({
+	Title = "ZenithHub",
+	Content = "Интерфейс успешно загружен",
+	Duration = 5
 })
