@@ -19,25 +19,22 @@ pcall(function()
     })
 end)
 
--- Подключение OrionLib
-local OrionLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/shlexware/Orion/main/source"))()
+-- Подключение Rayfield UI
+local Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
 
 -- Настройки языка
 local Languages = {
     ["RU"] = {
-        WindowName = "ZenithHub",
         TabName = "Главная",
         ButtonName = "Переводчик",
         Notify = "Язык изменён на русский"
     },
     ["EN"] = {
-        WindowName = "ZenithHub",
         TabName = "Home",
         ButtonName = "Translator",
         Notify = "Language switched to English"
     },
     ["UA"] = {
-        WindowName = "ZenithHub",
         TabName = "Головна",
         ButtonName = "Перекладач",
         Notify = "Мову змінено на українську"
@@ -49,50 +46,44 @@ local currentLang = "RU"
 local lang = Languages[currentLang]
 
 -- Создание окна
-local Window = OrionLib:MakeWindow({
-    Name = lang.WindowName,
-    HidePremium = false,
-    SaveConfig = false,
-    IntroText = lang.WindowName
+local Window = Rayfield:CreateWindow({
+	Name = "ZenithHub",
+	LoadingTitle = "ZenithHub",
+	LoadingSubtitle = "by ты",
+	ConfigurationSaving = {
+		Enabled = false
+	},
+	Discord = {
+		Enabled = false
+	},
+	KeySystem = false
 })
 
 -- Главная вкладка
-local Tab = Window:MakeTab({
-	Name = lang.TabName,
-	Icon = "",
-	PremiumOnly = false
-})
+local MainTab = Window:CreateTab(lang.TabName, 4483345998)
 
--- Переводчик
-Tab:AddButton({
+-- Кнопка перевода
+MainTab:CreateButton({
 	Name = lang.ButtonName,
 	Callback = function()
-		OrionLib:MakeNotification({
-			Name = "ZenithHub",
-			Content = "Выбери язык:\n1 - Русский\n2 - English\n3 - Українська",
-			Image = "",
-			Time = 6
+		Rayfield:Notify({
+			Title = "ZenithHub",
+			Content = "Выбери язык в чате: 1 - Рус, 2 - Англ, 3 - Укр",
+			Duration = 6
 		})
 
-		local player = game.Players.LocalPlayer
-		local inputConnection
-		inputConnection = player.Chatted:Connect(function(msg)
-			if msg == "1" then
-				currentLang = "RU"
-			elseif msg == "2" then
-				currentLang = "EN"
-			elseif msg == "3" then
-				currentLang = "UA"
-			else
-				return
-			end
+		local connection
+		connection = game.Players.LocalPlayer.Chatted:Connect(function(msg)
+			if msg == "1" then currentLang = "RU"
+			elseif msg == "2" then currentLang = "EN"
+			elseif msg == "3" then currentLang = "UA"
+			else return end
 
-			inputConnection:Disconnect()
-			OrionLib:MakeNotification({
-				Name = "ZenithHub",
+			connection:Disconnect()
+			Rayfield:Notify({
+				Title = "ZenithHub",
 				Content = Languages[currentLang].Notify,
-				Image = "",
-				Time = 3
+				Duration = 4
 			})
 			wait(1)
 			loadstring(game:HttpGet("https://raw.githubusercontent.com/cheese123/zenithhub/main/main.lua"))()
