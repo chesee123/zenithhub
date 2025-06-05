@@ -1,10 +1,11 @@
--- ZenithHub GUI (OrionLib Adapted Version for Mobile & PC)
+-- ZenithHub GUI (OrionLib Adapted for PC + Mobile)
 -- Author: ты
 
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 
--- Whitelist
+repeat wait() until game:IsLoaded()
+
 local allowed = {
     [8428035106] = true,
 }
@@ -13,94 +14,80 @@ if not allowed[LocalPlayer.UserId] then
     return
 end
 
--- Notify
-pcall(function()
-    game.StarterGui:SetCore("SendNotification", {
-        Title = "ZenithHub",
-        Text = "Launching ZenithHub...",
-        Duration = 4
-    })
-end)
+local playerGui = LocalPlayer:WaitForChild("PlayerGui")
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "ZenithHubGUI"
+screenGui.ResetOnSpawn = false
+screenGui.IgnoreGuiInset = true
+screenGui.ScreenInsets = Enum.ScreenInsets.None
+screenGui.Parent = playerGui
 
--- Load OrionLib (адаптированная)
-local OrionLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/Nosssa/orion-mobile/main/orionmobile.lua"))()
+local OrionLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/shlexware/Orion/main/source"))()
 
 local Window = OrionLib:MakeWindow({
     Name = "ZenithHub | Pet Simulator 99",
     HidePremium = false,
     SaveConfig = false,
     ConfigFolder = "ZenithHub",
-    IntroEnabled = false
-})
-
--- Мини-кнопка для повторного открытия
-local guiVisible = true
-local CoreGui = game:GetService("CoreGui")
-local toggleBtn = Instance.new("TextButton")
-toggleBtn.Text = "ZenithHub"
-toggleBtn.Size = UDim2.new(0, 100, 0, 30)
-toggleBtn.Position = UDim2.new(0, 10, 0, 10)
-toggleBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-toggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-toggleBtn.TextScaled = true
-toggleBtn.Visible = false
-toggleBtn.Parent = CoreGui:FindFirstChildOfClass("ScreenGui") or Instance.new("ScreenGui", CoreGui)
-
-toggleBtn.MouseButton1Click:Connect(function()
-    OrionLib:Toggle(true)
-    toggleBtn.Visible = false
-end)
-
--- Главная вкладка
-local MainTab = Window:MakeTab({
-    Name = "Home",
-    Icon = "rbxassetid://4483345998",
-    PremiumOnly = false
-})
-
-MainTab:AddButton({
-    Name = "– Minimize GUI",
-    Callback = function()
-        OrionLib:Toggle(false)
-        toggleBtn.Visible = true
+    IntroEnabled = false,
+    IntroText = "ZenithHub Loaded",
+    CloseCallback = function()
+        toggleButton.Visible = true
     end
 })
 
-MainTab:AddButton({
-    Name = "ZenithHub Discord",
-    Callback = function()
-        setclipboard("https://discord.gg/yourlink")
-    end
-})
-MainTab:AddParagraph("More news in our Discord server!")
-
-MainTab:AddButton({
-    Name = "ZenithHub Premium (soon)",
-    Callback = function()
-        setclipboard("https://yourshop.link")
-    end
-})
-MainTab:AddParagraph("Our premium version will be updated more frequently than the free one.")
-
--- Остальные вкладки
-local tabNames = {
-    "Farming Event",
-    "AutoFarm",
-    "Egg",
-    "MiniGames",
-    "AutoRank (Soon...)",
-    "Webhook",
-    "Player",
-    "Setting"
+local lang = {
+    Tabs = {
+        "Home",
+        "Farming Event",
+        "AutoFarm",
+        "Egg",
+        "MiniGames",
+        "AutoRank (Soon...)",
+        "Webhook",
+        "Player",
+        "Setting"
+    },
+    DiscordTitle = "ZenithHub Discord",
+    DiscordDesc = "More news on our Discord server!",
+    PremiumTitle = "ZenithHub Premium (soon)",
+    PremiumDesc = "Our premium version will be updated more frequently than the free one."
 }
 
-for _, tabName in ipairs(tabNames) do
-    Window:MakeTab({
-        Name = tabName,
+local Tabs = {}
+for _, name in ipairs(lang.Tabs) do
+    Tabs[name] = Window:MakeTab({
+        Name = name,
         Icon = "rbxassetid://4483345998",
         PremiumOnly = false
     })
 end
 
--- Инициализация
-OrionLib:Init()
+Tabs["Home"]:AddButton({
+    Name = lang.DiscordTitle .. " - " .. lang.DiscordDesc,
+    Callback = function()
+        setclipboard("https://discord.gg/yourlink")
+    end
+})
+
+Tabs["Home"]:AddButton({
+    Name = lang.PremiumTitle .. " - " .. lang.PremiumDesc,
+    Callback = function()
+        setclipboard("https://yourshop.link")
+    end
+})
+
+local toggleButton = Instance.new("TextButton")
+toggleButton.Text = "ZenithHub"
+toggleButton.Size = UDim2.new(0, 100, 0, 30)
+toggleButton.Position = UDim2.new(0, 10, 0, 10)
+toggleButton.TextScaled = true
+toggleButton.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+toggleButton.TextColor3 = Color3.new(1, 1, 1)
+toggleButton.Visible = false
+toggleButton.Parent = screenGui
+
+toggleButton.MouseButton1Click:Connect(function()
+    toggleButton.Visible = false
+    OrionLib:Init()
+end)
