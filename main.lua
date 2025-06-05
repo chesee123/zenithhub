@@ -1,4 +1,4 @@
--- ZenithHub GUI (Adapted OrionLib)
+-- ZenithHub GUI (OrionLib Adapted Version for Mobile & PC)
 -- Author: ты
 
 local Players = game:GetService("Players")
@@ -13,112 +13,94 @@ if not allowed[LocalPlayer.UserId] then
     return
 end
 
--- Уведомление при запуске
+-- Notify
 pcall(function()
     game.StarterGui:SetCore("SendNotification", {
         Title = "ZenithHub",
-        Text = "Запускаем ZenithHub!",
+        Text = "Launching ZenithHub...",
         Duration = 4
     })
 end)
 
--- Подключаем OrionLib адаптированную
-local OrionLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/shlexware/Orion/main/source"))()
+-- Load OrionLib (адаптированная)
+local OrionLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/Nosssa/orion-mobile/main/orionmobile.lua"))()
 
 local Window = OrionLib:MakeWindow({
     Name = "ZenithHub | Pet Simulator 99",
     HidePremium = false,
     SaveConfig = false,
-    ConfigFolder = "ZenithHubConfig",
-    IntroText = "ZenithHub запускается...",
-    IntroEnabled = true
+    ConfigFolder = "ZenithHub",
+    IntroEnabled = false
 })
 
--- Список вкладок (обновлён)
-local Tabs = {
-    "Home",
+-- Мини-кнопка для повторного открытия
+local guiVisible = true
+local CoreGui = game:GetService("CoreGui")
+local toggleBtn = Instance.new("TextButton")
+toggleBtn.Text = "ZenithHub"
+toggleBtn.Size = UDim2.new(0, 100, 0, 30)
+toggleBtn.Position = UDim2.new(0, 10, 0, 10)
+toggleBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+toggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+toggleBtn.TextScaled = true
+toggleBtn.Visible = false
+toggleBtn.Parent = CoreGui:FindFirstChildOfClass("ScreenGui") or Instance.new("ScreenGui", CoreGui)
+
+toggleBtn.MouseButton1Click:Connect(function()
+    OrionLib:Toggle(true)
+    toggleBtn.Visible = false
+end)
+
+-- Главная вкладка
+local MainTab = Window:MakeTab({
+    Name = "Home",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+MainTab:AddButton({
+    Name = "– Minimize GUI",
+    Callback = function()
+        OrionLib:Toggle(false)
+        toggleBtn.Visible = true
+    end
+})
+
+MainTab:AddButton({
+    Name = "ZenithHub Discord",
+    Callback = function()
+        setclipboard("https://discord.gg/yourlink")
+    end
+})
+MainTab:AddParagraph("More news in our Discord server!")
+
+MainTab:AddButton({
+    Name = "ZenithHub Premium (soon)",
+    Callback = function()
+        setclipboard("https://yourshop.link")
+    end
+})
+MainTab:AddParagraph("Our premium version will be updated more frequently than the free one.")
+
+-- Остальные вкладки
+local tabNames = {
     "Farming Event",
     "AutoFarm",
     "Egg",
     "MiniGames",
     "AutoRank (Soon...)",
-    -- "Gmail", -- удалена
     "Webhook",
     "Player",
     "Setting"
 }
 
-local TabObjects = {}
-for _, name in ipairs(Tabs) do
-    TabObjects[name] = Window:MakeTab({
-        Name = name,
+for _, tabName in ipairs(tabNames) do
+    Window:MakeTab({
+        Name = tabName,
         Icon = "rbxassetid://4483345998",
         PremiumOnly = false
     })
 end
 
--- Главная
-TabObjects["Home"]:AddButton({
-    Name = "ZenithHub Discord\n> Больше новостей в нашем Discord сервере!",
-    Callback = function()
-        setclipboard("https://discord.gg/yourlink")
-    end
-})
-TabObjects["Home"]:AddButton({
-    Name = "ZenithHub Premium (soon)\n> Наша премиум версия будет чаще обновляться чем обычная!",
-    Callback = function()
-        setclipboard("https://yourshop.link")
-    end
-})
-
--- Настройки
-TabObjects["Setting"]:AddDropdown({
-    Name = "Change Language",
-    Default = "RU",
-    Options = {"RU", "EN", "UA"},
-    Callback = function(value)
-        print("Выбран язык: "..value)
-    end
-})
-
--- Кнопка закрытия и возврата
-local minimized = false
-local MiniGui = Instance.new("ScreenGui", game.CoreGui)
-MiniGui.Name = "ZenithHubMini"
-
-local Button = Instance.new("TextButton", MiniGui)
-Button.Text = "ZenithHub"
-Button.Size = UDim2.new(0, 90, 0, 25)
-Button.Position = UDim2.new(0, 10, 1, -35)
-Button.BackgroundColor3 = Color3.fromRGB(30,30,30)
-Button.TextColor3 = Color3.fromRGB(255,255,255)
-Button.Visible = false
-
-OrionLib:MakeNotification({
-    Name = "Готово!",
-    Content = "GUI загружено успешно.",
-    Image = "rbxassetid://4483345998",
-    Time = 5
-})
-
--- Закрыть
-Window:MakeTab({
-    Name = "-",
-    Icon = "rbxassetid://7072719332",
-    PremiumOnly = false
-}):AddButton({
-    Name = "Закрыть скрипт",
-    Callback = function()
-        for _, v in pairs(game.CoreGui:GetChildren()) do
-            if v.Name:find("Orion") then
-                v:Destroy()
-            end
-        end
-        Button.Visible = true
-    end
-})
-
--- Вернуть окно
-Button.MouseButton1Click:Connect(function()
-    loadstring(game:HttpGet("https://yourcdn.com/zenithhub.lua"))() -- Укажи свой URL
-end)
+-- Инициализация
+OrionLib:Init()
