@@ -17,58 +17,46 @@ end
 pcall(function()
     game.StarterGui:SetCore("SendNotification", {
         Title = "ZenithHub",
-        Text = "Запускаем ZenithHub!",
+        Text = "Launching ZenithHub!",
         Duration = 4
     })
 end)
 
--- Языки
-local currentLang = "RU"
-local Languages = {
-    RU = {
-        DiscordTitle = "ZenithHub Discord",
-        DiscordDesc = "Больше новостей в нашем Discord сервере!",
-        PremiumTitle = "ZenithHub Premium (soon)",
-        PremiumDesc = "Наша премиум версия будет чаще обновляться чем обычная!",
-        Tabs = {
-            "Главная",
-            "Фарминг Ивент",
-            "АвтоФарм",
-            "Яйца",
-            "Миниигры",
-            "АвтоРанг (Бета)",
-            "Почта",
-            "Автоматизация",
-            "Вебхук",
-            "Игрок",
-            "Настройки"
-        }
-    }
+-- English only
+local TabsList = {
+    "Home",
+    "Farming Event",
+    "AutoFarm",
+    "Egg",
+    "MiniGames",
+    "AutoRank (Soon...)",
+    "Webhook",
+    "Player",
+    "Setting"
 }
-local lang = Languages[currentLang]
 
--- Подключаем Kavo UI Mobile/PC адаптированную
+-- UI
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
 local Window = Library.CreateLib("ZenithHub | Pet Simulator 99", "DarkTheme")
 
--- Создаем вкладки
+-- Tabs
 local Tabs = {}
-for _, tabName in ipairs(lang.Tabs) do
+for _, tabName in ipairs(TabsList) do
     Tabs[tabName] = Window:NewTab(tabName)
 end
 
--- Главная
-local HomeSection = Tabs["Главная"]:NewSection("Информация")
-HomeSection:NewButton(lang.DiscordTitle, lang.DiscordDesc, function()
-    setclipboard("https://discord.gg/yourlink") -- вставь свою ссылку
+-- Home
+local HomeSection = Tabs["Home"]:NewSection("Information")
+HomeSection:NewButton("ZenithHub Discord", "More news on our Discord server!", function()
+    setclipboard("https://discord.gg/yourlink") -- вставь ссылку
 end)
-HomeSection:NewButton(lang.PremiumTitle, lang.PremiumDesc, function()
-    setclipboard("https://yourshop.link") -- вставь свою ссылку
+HomeSection:NewButton("ZenithHub Premium (soon)", "Premium gets more frequent updates!", function()
+    setclipboard("https://yourshop.link") -- вставь ссылку
 end)
 
--- Настройки
-local SettingsSection = Tabs["Настройки"]:NewSection("Настройки GUI")
-SettingsSection:NewDropdown("Сменить язык", "Выберите язык интерфейса", {"RU", "EN", "UA"}, function(selectedLang)
-    print("Выбран язык:", selectedLang)
-    -- Здесь можешь реализовать полную перезагрузку GUI
+-- Setting
+local SettingsSection = Tabs["Setting"]:NewSection("Interface")
+SettingsSection:NewDropdown("Change language", "Select interface language", {"RU", "EN", "UA"}, function(selectedLang)
+    print("Language selected:", selectedLang)
+    -- Здесь можно реализовать смену языка
 end)
