@@ -4,10 +4,6 @@
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 
--- Whitelist check
-local allowed = {
-    [8428035106] = true, -- твой UserId
-}
 if not allowed[LocalPlayer.UserId] then
     game:Shutdown()
     return
