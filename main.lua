@@ -1,4 +1,4 @@
--- ZenithHub GUI (CatLib UI Version)
+-- ZenithHub GUI (Kavo UI Mobile/PC Version)
 -- Author: ты
 
 local Players = game:GetService("Players")
@@ -22,7 +22,7 @@ pcall(function()
     })
 end)
 
--- Language config
+-- Языки
 local currentLang = "RU"
 local Languages = {
     RU = {
@@ -47,44 +47,28 @@ local Languages = {
 }
 local lang = Languages[currentLang]
 
--- Подключаем CatLib UI безопасно
-loadstring(game:HttpGet("https://raw.githubusercontent.com/RegularVynixu/Utilities/main/CatLib/CatLib.lua"))()
+-- Подключаем Kavo UI Mobile/PC адаптированную
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
+local Window = Library.CreateLib("ZenithHub | Pet Simulator 99", "DarkTheme")
 
-repeat task.wait() until CatLib and CatLib.CreateWindow
-
--- Окно
-local Window = CatLib:CreateWindow({
-    Name = "ZenithHub | Pet Simulator 99",
-    Theme = CatLib.Themes.Dark,
-    Size = UDim2.new(0, 700, 0, 500),
-    Position = UDim2.new(0.5, -350, 0.5, -250)
-})
-
--- Табуляция
+-- Создаем вкладки
 local Tabs = {}
 for _, tabName in ipairs(lang.Tabs) do
-    Tabs[tabName] = Window:CreateTab(tabName)
+    Tabs[tabName] = Window:NewTab(tabName)
 end
 
--- Главная вкладка
-local HomeTab = Tabs["Главная"]
-HomeTab:CreateLabel(lang.DiscordTitle, function()
-    setclipboard("https://discord.gg/yourlink") -- ВСТАВЬ СВОЙ ЛИНК
+-- Главная
+local HomeSection = Tabs["Главная"]:NewSection("Информация")
+HomeSection:NewButton(lang.DiscordTitle, lang.DiscordDesc, function()
+    setclipboard("https://discord.gg/yourlink") -- вставь свою ссылку
 end)
-HomeTab:CreateParagraph(lang.DiscordDesc)
-HomeTab:CreateLabel(lang.PremiumTitle, function()
-    setclipboard("https://yourshop.link") -- ВСТАВЬ СВОЙ ЛИНК
+HomeSection:NewButton(lang.PremiumTitle, lang.PremiumDesc, function()
+    setclipboard("https://yourshop.link") -- вставь свою ссылку
 end)
-HomeTab:CreateParagraph(lang.PremiumDesc)
 
 -- Настройки
-local SettingsTab = Tabs["Настройки"]
-SettingsTab:CreateLabel("Сменить язык")
-SettingsTab:CreateDropdown({
-    Title = "Выбери язык",
-    Options = {"RU", "EN", "UA"},
-    Callback = function(selectedLang)
-        setclipboard("https://github.com/cheese123/zenithhub") -- можно перезагрузить с новым языком
-        warn("Выбран язык:", selectedLang)
-    end
-})
+local SettingsSection = Tabs["Настройки"]:NewSection("Настройки GUI")
+SettingsSection:NewDropdown("Сменить язык", "Выберите язык интерфейса", {"RU", "EN", "UA"}, function(selectedLang)
+    print("Выбран язык:", selectedLang)
+    -- Здесь можешь реализовать полную перезагрузку GUI
+end)
