@@ -1,9 +1,9 @@
--- ZenithHub v1.1
+-- ZenithHub v2.0 (на базе OrionLib, кастомный стиль)
 -- Автор: ты
 
 -- WhiteList по UserId
 local allowed = {
-    [8428035106] = true -- добавь сюда другие UserId при необходимости
+    [8428035106] = true -- добавь сюда других, если нужно
 }
 if not allowed[game.Players.LocalPlayer.UserId] then
     game:Shutdown()
@@ -19,105 +19,113 @@ pcall(function()
     })
 end)
 
--- Подключение Rayfield UI
-local Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
+-- Подключение OrionLib
+local OrionLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/shlexware/Orion/main/source"))()
 
 -- Настройки языка
 local Languages = {
     ["RU"] = {
         Home = "Главная",
-        Setting = "Настройки",
-        DiscordTitle = "ZenithHub Discord",
-        DiscordDesc = "Больше новостей в нашем Дискорд сервере",
-        PremiumTitle = "ZenithHub Premium (скоро)",
-        PremiumDesc = "Наша премиум версия будет чаще обновляться чем обычная!",
-        ChangeLang = "Сменить язык",
+        Discord = "ZenithHub Discord",
+        DiscordDesc = "Больше новостей в нашем Discord сервере!",
+        Premium = "ZenithHub Premium (скоро)",
+        PremiumDesc = "Премиум будет обновляться чаще обычной версии!",
+        Language = "Сменить язык",
         RU = "Русский",
         EN = "Английский",
         UA = "Украинский"
     },
     ["EN"] = {
         Home = "Home",
-        Setting = "Settings",
-        DiscordTitle = "ZenithHub Discord",
-        DiscordDesc = "Join our Discord server for more updates!",
-        PremiumTitle = "ZenithHub Premium (soon)",
-        PremiumDesc = "The premium version will update more frequently than the regular one!",
-        ChangeLang = "Change Language",
+        Discord = "ZenithHub Discord",
+        DiscordDesc = "Join our Discord for more news!",
+        Premium = "ZenithHub Premium (soon)",
+        PremiumDesc = "Premium version updates faster than free!",
+        Language = "Change Language",
         RU = "Russian",
         EN = "English",
         UA = "Ukrainian"
     },
     ["UA"] = {
         Home = "Головна",
-        Setting = "Налаштування",
-        DiscordTitle = "ZenithHub Discord",
-        DiscordDesc = "Приєднуйтесь до нашого Discord серверу для новин!",
-        PremiumTitle = "ZenithHub Premium (незабаром)",
-        PremiumDesc = "Преміум версія оновлюватиметься частіше за звичайну!",
-        ChangeLang = "Змінити мову",
+        Discord = "ZenithHub Discord",
+        DiscordDesc = "Долучайтесь до Discord, щоб дізнатись більше!",
+        Premium = "ZenithHub Premium (незабаром)",
+        PremiumDesc = "Преміум оновлюється частіше звичайного!",
+        Language = "Змінити мову",
         RU = "Російська",
         EN = "Англійська",
         UA = "Українська"
     }
 }
 
--- Получаем текущий язык из _G, если установлен
-local currentLang = _G.ZH_Lang or "RU"
+local currentLang = "RU"
 local lang = Languages[currentLang]
 
--- Создание главного окна
-local Window = Rayfield:CreateWindow({
+-- Создание окна
+local Window = OrionLib:MakeWindow({
     Name = "ZenithHub",
-    LoadingTitle = "ZenithHub",
-    LoadingSubtitle = "by ты",
-    ConfigurationSaving = { Enabled = false },
-    Discord = { Enabled = false },
-    KeySystem = false
+    HidePremium = true,
+    SaveConfig = false,
+    IntroText = "ZenithHub"
 })
 
--- Вкладка Home
-local Home = Window:CreateTab(lang.Home, 4483345998)
-Home:CreateParagraph({
-    Title = lang.DiscordTitle,
-    Content = lang.DiscordDesc
+-- Главная вкладка
+local HomeTab = Window:MakeTab({
+    Name = lang.Home,
+    Icon = "",
+    PremiumOnly = false
 })
-Home:CreateButton({
-    Name = lang.DiscordTitle,
+
+-- Кликабельный Discord текст (имитирован как кнопка без рамки)
+HomeTab:AddParagraph(lang.Discord, lang.DiscordDesc)
+HomeTab:AddButton({
+    Name = " ",
     Callback = function()
-        setclipboard("ВСТАВЬ_ССЫЛКУ_НА_DISCORD")
-    end
-})
-Home:CreateParagraph({
-    Title = lang.PremiumTitle,
-    Content = lang.PremiumDesc
-})
-Home:CreateButton({
-    Name = lang.PremiumTitle,
-    Callback = function()
-        setclipboard("ВСТАВЬ_ССЫЛКУ_НА_ПРЕМИУМ")
+        setclipboard("https://your-discord-link")
+        OrionLib:MakeNotification({
+            Name = "ZenithHub",
+            Content = "Ссылка на Discord скопирована!",
+            Time = 3
+        })
     end
 })
 
--- Вкладка Settings
-local Settings = Window:CreateTab(lang.Setting, 4483345998)
-Settings:CreateDropdown({
-    Name = lang.ChangeLang,
-    Options = { lang.RU, lang.EN, lang.UA },
-    CurrentOption = lang[currentLang],
+-- Премиум блок
+HomeTab:AddParagraph(lang.Premium, lang.PremiumDesc)
+HomeTab:AddButton({
+    Name = " ",
+    Callback = function()
+        setclipboard("https://your-premium-link")
+        OrionLib:MakeNotification({
+            Name = "ZenithHub",
+            Content = "Ссылка на Premium скопирована!",
+            Time = 3
+        })
+    end
+})
+
+-- Вкладка настроек
+local SettingsTab = Window:MakeTab({
+    Name = "Settings",
+    Icon = "",
+    PremiumOnly = false
+})
+
+-- Меню смены языка (мини подменю)
+SettingsTab:AddDropdown({
+    Name = lang.Language,
+    Options = {"RU", "EN", "UA"},
+    CurrentOption = currentLang,
     Callback = function(option)
-        for key, value in pairs(Languages) do
-            if value.RU == option or value.EN == option or value.UA == option then
-                _G.ZH_Lang = key
-                Rayfield:Notify({
-                    Title = "ZenithHub",
-                    Content = "Язык изменён. Перезапуск...",
-                    Duration = 3
-                })
-                wait(1)
-                loadstring(game:HttpGet("https://raw.githubusercontent.com/cheese123/zenithhub/main/main.lua"))()
-                return
-            end
-        end
+        currentLang = option
+        lang = Languages[currentLang]
+        OrionLib:MakeNotification({
+            Name = "ZenithHub",
+            Content = "Язык обновлён: " .. lang[option],
+            Time = 3
+        })
+        wait(1)
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/cheese123/zenithhub/main/main.lua"))()
     end
 })
