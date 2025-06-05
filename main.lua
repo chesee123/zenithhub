@@ -4,6 +4,10 @@
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 
+-- Whitelist check
+local allowed = {
+    [8428035106] = true,
+}
 if not allowed[LocalPlayer.UserId] then
     game:Shutdown()
     return
@@ -14,7 +18,18 @@ repeat task.wait() until game:IsLoaded()
 -- Load OrionLib
 local OrionLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/shlexware/Orion/main/source"))()
 
--- Main GUI
+-- Mini reopen button (invisible by default)
+local openGuiBtn = Instance.new("TextButton")
+openGuiBtn.Text = "ZenithHub"
+openGuiBtn.Size = UDim2.new(0, 90, 0, 25)
+openGuiBtn.Position = UDim2.new(0, 10, 1, -40)
+openGuiBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+openGuiBtn.TextColor3 = Color3.new(1, 1, 1)
+openGuiBtn.Visible = false
+openGuiBtn.ZIndex = 9999
+openGuiBtn.Parent = game:GetService("CoreGui")
+
+-- Create main window
 local Window = OrionLib:MakeWindow({
     Name = "ZenithHub | Pet Simulator 99",
     HidePremium = false,
@@ -29,17 +44,7 @@ local Window = OrionLib:MakeWindow({
     end
 })
 
--- Show button when closed
-local openGuiBtn = Instance.new("TextButton")
-openGuiBtn.Text = "ZenithHub"
-openGuiBtn.Size = UDim2.new(0, 100, 0, 30)
-openGuiBtn.Position = UDim2.new(0, 10, 1, -40)
-openGuiBtn.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-openGuiBtn.TextColor3 = Color3.new(1, 1, 1)
-openGuiBtn.Visible = false
-openGuiBtn.Parent = game:GetService("CoreGui")
-
--- Tabs
+-- Tabs list
 local tabNames = {
     "Home",
     "Farming Event",
@@ -52,6 +57,7 @@ local tabNames = {
     "Setting"
 }
 
+-- Tabs init
 local Tabs = {}
 for _, name in ipairs(tabNames) do
     Tabs[name] = Window:MakeTab({
@@ -61,11 +67,11 @@ for _, name in ipairs(tabNames) do
     })
 end
 
--- HOME
+-- HOME tab
 Tabs["Home"]:AddButton({
     Name = "ZenithHub Discord",
     Callback = function()
-        setclipboard("https://discord.gg/yourlink") -- вставь свою ссылку
+        setclipboard("https://discord.gg/yourlink")
     end
 })
 Tabs["Home"]:AddParagraph("More news on our Discord server!", "")
@@ -73,23 +79,21 @@ Tabs["Home"]:AddParagraph("More news on our Discord server!", "")
 Tabs["Home"]:AddButton({
     Name = "ZenithHub Premium (soon)",
     Callback = function()
-        setclipboard("https://yourshop.link") -- вставь свою ссылку
+        setclipboard("https://yourshop.link")
     end
 })
 Tabs["Home"]:AddParagraph("Our premium version updates more often than the regular one!", "")
 
--- SETTINGS
+-- SETTINGS tab
 Tabs["Setting"]:AddDropdown({
     Name = "Select Language",
     Default = "EN",
     Options = {"EN", "RU", "UA"},
     Callback = function(Value)
         warn("Selected language: " .. Value)
-        -- Здесь ты можешь добавить reload GUI
     end
 })
 
--- CLOSE GUI BUTTON
 Tabs["Setting"]:AddButton({
     Name = "- Close ZenithHub",
     Callback = function()
@@ -98,7 +102,7 @@ Tabs["Setting"]:AddButton({
     end
 })
 
--- REOPEN GUI BUTTON
+-- Restore GUI on button click
 openGuiBtn.MouseButton1Click:Connect(function()
     OrionLib:Init()
     openGuiBtn.Visible = false
