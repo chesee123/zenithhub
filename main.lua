@@ -1,16 +1,16 @@
--- ZenithHub v1.1 (Custom GUI)
+-- ZenithHub v1.1
 -- Автор: ты
 
 -- WhiteList по UserId
 local allowed = {
-    [8428035106] = true -- добавь других, если нужно
+    [8428035106] = true -- добавь сюда другие UserId при необходимости
 }
 if not allowed[game.Players.LocalPlayer.UserId] then
     game:Shutdown()
     return
 end
 
--- Уведомление о запуске
+-- Уведомление при запуске
 pcall(function()
     game.StarterGui:SetCore("SendNotification", {
         Title = "ZenithHub",
@@ -19,136 +19,105 @@ pcall(function()
     })
 end)
 
--- Сервис GUI
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
-local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+-- Подключение Rayfield UI
+local Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
 
--- Удаление предыдущего GUI (если есть)
-if PlayerGui:FindFirstChild("ZenithHubUI") then
-    PlayerGui.ZenithHubUI:Destroy()
-end
+-- Настройки языка
+local Languages = {
+    ["RU"] = {
+        Home = "Главная",
+        Setting = "Настройки",
+        DiscordTitle = "ZenithHub Discord",
+        DiscordDesc = "Больше новостей в нашем Дискорд сервере",
+        PremiumTitle = "ZenithHub Premium (скоро)",
+        PremiumDesc = "Наша премиум версия будет чаще обновляться чем обычная!",
+        ChangeLang = "Сменить язык",
+        RU = "Русский",
+        EN = "Английский",
+        UA = "Украинский"
+    },
+    ["EN"] = {
+        Home = "Home",
+        Setting = "Settings",
+        DiscordTitle = "ZenithHub Discord",
+        DiscordDesc = "Join our Discord server for more updates!",
+        PremiumTitle = "ZenithHub Premium (soon)",
+        PremiumDesc = "The premium version will update more frequently than the regular one!",
+        ChangeLang = "Change Language",
+        RU = "Russian",
+        EN = "English",
+        UA = "Ukrainian"
+    },
+    ["UA"] = {
+        Home = "Головна",
+        Setting = "Налаштування",
+        DiscordTitle = "ZenithHub Discord",
+        DiscordDesc = "Приєднуйтесь до нашого Discord серверу для новин!",
+        PremiumTitle = "ZenithHub Premium (незабаром)",
+        PremiumDesc = "Преміум версія оновлюватиметься частіше за звичайну!",
+        ChangeLang = "Змінити мову",
+        RU = "Російська",
+        EN = "Англійська",
+        UA = "Українська"
+    }
+}
 
--- Создание основного GUI
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "ZenithHubUI"
-ScreenGui.Parent = PlayerGui
+-- Получаем текущий язык из _G, если установлен
+local currentLang = _G.ZH_Lang or "RU"
+local lang = Languages[currentLang]
 
--- Создание главной рамки
-local MainFrame = Instance.new("Frame")
-MainFrame.Size = UDim2.new(0, 400, 0, 300)
-MainFrame.Position = UDim2.new(0.5, -200, 0.5, -150)
-MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-MainFrame.BorderSizePixel = 0
-MainFrame.Parent = ScreenGui
+-- Создание главного окна
+local Window = Rayfield:CreateWindow({
+    Name = "ZenithHub",
+    LoadingTitle = "ZenithHub",
+    LoadingSubtitle = "by ты",
+    ConfigurationSaving = { Enabled = false },
+    Discord = { Enabled = false },
+    KeySystem = false
+})
 
--- UI Corner
-local UICorner = Instance.new("UICorner", MainFrame)
-UICorner.CornerRadius = UDim.new(0, 8)
+-- Вкладка Home
+local Home = Window:CreateTab(lang.Home, 4483345998)
+Home:CreateParagraph({
+    Title = lang.DiscordTitle,
+    Content = lang.DiscordDesc
+})
+Home:CreateButton({
+    Name = lang.DiscordTitle,
+    Callback = function()
+        setclipboard("ВСТАВЬ_ССЫЛКУ_НА_DISCORD")
+    end
+})
+Home:CreateParagraph({
+    Title = lang.PremiumTitle,
+    Content = lang.PremiumDesc
+})
+Home:CreateButton({
+    Name = lang.PremiumTitle,
+    Callback = function()
+        setclipboard("ВСТАВЬ_ССЫЛКУ_НА_ПРЕМИУМ")
+    end
+})
 
--- ZenithHub Discord
-local DiscordBtn = Instance.new("TextButton")
-DiscordBtn.Size = UDim2.new(1, -20, 0, 40)
-DiscordBtn.Position = UDim2.new(0, 10, 0, 10)
-DiscordBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-DiscordBtn.Text = "ZenithHub Discord"
-DiscordBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-DiscordBtn.Font = Enum.Font.GothamBold
-DiscordBtn.TextSize = 20
-DiscordBtn.Parent = MainFrame
-DiscordBtn.MouseButton1Click:Connect(function()
-    setclipboard("ТУТ_ВСТАВЬ_ССЫЛКУ_НА_ДИС")
-end)
-
--- Подтекст к Discord
-local DiscordInfo = Instance.new("TextLabel")
-DiscordInfo.Size = UDim2.new(1, -20, 0, 20)
-DiscordInfo.Position = UDim2.new(0, 10, 0, 55)
-DiscordInfo.BackgroundTransparency = 1
-DiscordInfo.Text = "Заходите в наш Discord сервер чтоб узнать больше новостей!"
-DiscordInfo.TextColor3 = Color3.fromRGB(160, 160, 160)
-DiscordInfo.Font = Enum.Font.Gotham
-DiscordInfo.TextSize = 12
-DiscordInfo.TextXAlignment = Enum.TextXAlignment.Left
-DiscordInfo.Parent = MainFrame
-
--- ZenithHub Premium
-local PremiumBtn = Instance.new("TextButton")
-PremiumBtn.Size = UDim2.new(1, -20, 0, 40)
-PremiumBtn.Position = UDim2.new(0, 10, 0, 85)
-PremiumBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-PremiumBtn.Text = "ZenithHub Premium (soon)"
-PremiumBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-PremiumBtn.Font = Enum.Font.GothamBold
-PremiumBtn.TextSize = 20
-PremiumBtn.Parent = MainFrame
-PremiumBtn.MouseButton1Click:Connect(function()
-    setclipboard("ТУТ_ВСТАВЬ_ССЫЛКУ_НА_ШОП")
-end)
-
--- Подтекст к Premium
-local PremiumInfo = Instance.new("TextLabel")
-PremiumInfo.Size = UDim2.new(1, -20, 0, 20)
-PremiumInfo.Position = UDim2.new(0, 10, 0, 130)
-PremiumInfo.BackgroundTransparency = 1
-PremiumInfo.Text = "Премиум версия будет обновляться чаще чем обычная версия!"
-PremiumInfo.TextColor3 = Color3.fromRGB(160, 160, 160)
-PremiumInfo.Font = Enum.Font.Gotham
-PremiumInfo.TextSize = 12
-PremiumInfo.TextXAlignment = Enum.TextXAlignment.Left
-PremiumInfo.Parent = MainFrame
-
--- Кнопка Настройки
-local SettingsBtn = Instance.new("TextButton")
-SettingsBtn.Size = UDim2.new(0, 120, 0, 30)
-SettingsBtn.Position = UDim2.new(1, -130, 1, -40)
-SettingsBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-SettingsBtn.Text = "Настройки"
-SettingsBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-SettingsBtn.Font = Enum.Font.Gotham
-SettingsBtn.TextSize = 14
-SettingsBtn.Parent = MainFrame
-
--- Меню настроек
-local SettingsFrame = Instance.new("Frame")
-SettingsFrame.Size = UDim2.new(0, 200, 0, 100)
-SettingsFrame.Position = UDim2.new(0.5, -100, 0.5, -50)
-SettingsFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-SettingsFrame.Visible = false
-SettingsFrame.Parent = MainFrame
-local SettingsCorner = Instance.new("UICorner", SettingsFrame)
-SettingsCorner.CornerRadius = UDim.new(0, 8)
-
--- Кнопка смены языка
-local LangBtn = Instance.new("TextButton")
-LangBtn.Size = UDim2.new(1, -20, 0, 30)
-LangBtn.Position = UDim2.new(0, 10, 0, 10)
-LangBtn.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-LangBtn.Text = "Сменить язык"
-LangBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-LangBtn.Font = Enum.Font.Gotham
-LangBtn.TextSize = 14
-LangBtn.Parent = SettingsFrame
-LangBtn.MouseButton1Click:Connect(function()
-    game.StarterGui:SetCore("SendNotification", {
-        Title = "ZenithHub",
-        Text = "1 - Русский, 2 - English, 3 - Українська",
-        Duration = 5
-    })
-    local conn
-    conn = LocalPlayer.Chatted:Connect(function(msg)
-        if msg == "1" then
-            game.StarterGui:SetCore("SendNotification", {Title = "ZenithHub", Text = "Язык изменён на Русский", Duration = 3})
-        elseif msg == "2" then
-            game.StarterGui:SetCore("SendNotification", {Title = "ZenithHub", Text = "Language set to English", Duration = 3})
-        elseif msg == "3" then
-            game.StarterGui:SetCore("SendNotification", {Title = "ZenithHub", Text = "Мову змінено на Українську", Duration = 3})
+-- Вкладка Settings
+local Settings = Window:CreateTab(lang.Setting, 4483345998)
+Settings:CreateDropdown({
+    Name = lang.ChangeLang,
+    Options = { lang.RU, lang.EN, lang.UA },
+    CurrentOption = lang[currentLang],
+    Callback = function(option)
+        for key, value in pairs(Languages) do
+            if value.RU == option or value.EN == option or value.UA == option then
+                _G.ZH_Lang = key
+                Rayfield:Notify({
+                    Title = "ZenithHub",
+                    Content = "Язык изменён. Перезапуск...",
+                    Duration = 3
+                })
+                wait(1)
+                loadstring(game:HttpGet("https://raw.githubusercontent.com/cheese123/zenithhub/main/main.lua"))()
+                return
+            end
         end
-        conn:Disconnect()
-    end)
-end)
-
--- Открытие/закрытие настроек
-SettingsBtn.MouseButton1Click:Connect(function()
-    SettingsFrame.Visible = not SettingsFrame.Visible
-end)
+    end
+})
